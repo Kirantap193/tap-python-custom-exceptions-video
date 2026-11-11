@@ -22,9 +22,13 @@
       var IW = 1985, IH = 667, DW = 480, sc = DW / IW, HX = 34, HY = -32;
       var CUT = [150, 425, 640, 748, 830, 1060, 1285, 1445, 1695, 1985];
       var slices = [];
-      for (var i = 0; i < CUT.length - 1; i++) {
+      // only "Valid:" - the letters V a l i d and the colon; "ate" is left out and the colon
+      // slides left to sit right after the d
+      var KEEP = [0, 1, 2, 3, 4, 8], SHIFT = { 8: Math.round((CUT[5] - CUT[8]) * sc) + 4 };
+      for (var ki = 0; ki < KEEP.length; ki++) {
+        var i = KEEP[ki];
         var x0 = Math.round(CUT[i] * sc), x1 = Math.round(CUT[i + 1] * sc);
-        var s = k.hide(k.el("div", "g1-sl", "left:" + (HX + x0) + "px;top:" + HY + "px;width:" + (x1 - x0) + "px;height:" + Math.round(IH * sc) + "px;", null, L.el));
+        var s = k.hide(k.el("div", "g1-sl", "left:" + (HX + x0 + (SHIFT[i] || 0)) + "px;top:" + HY + "px;width:" + (x1 - x0) + "px;height:" + Math.round(IH * sc) + "px;", null, L.el));
         var im = k.el("img", "", "left:" + (-x0) + "px;width:" + DW + "px;height:" + Math.round(IH * sc) + "px;", null, s);
         im.src = "assets/validate-title.png";
         s.style.transformOrigin = "50% 75%";

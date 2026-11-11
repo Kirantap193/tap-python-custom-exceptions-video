@@ -1,80 +1,155 @@
 <template id="g2-a-template">
   <style>
     #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-    .g2-tree .cx-box::before { border-width: 18px; }
+    .g2-bar { position: absolute; display: block; }
   </style>
   <div data-hf-id="hf-2hw0" id="root" data-composition-id="g2-a" data-width="1920" data-height="1080" data-duration="26.5"></div>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
   <script src="assets/kit.js"></script>
   <script src="assets/cx.js"></script>
+  <script src="assets/cx-art.js"></script>
   <script>
     (function () {
+      // Exception Hierarchy, entirely from the user's component sheet (assets/cx-art/eh-*):
+      // boxes, the up-arrow and the connector bars. Flow: title -> BaseException -> row 2 with its
+      // arrow -> row 3 with its arrow -> each child class one by one, every piece popping up.
       var tl = gsap.timeline({ paused: true });
       var root = document.querySelector('[data-composition-id="g2-a"]');
       var k = K.make(root, tl);
       var BEAT = window.__g2aBeats = {};
       var L = k.layer({ x: 0, y: 56, w: 1920, h: 1080 });     // true frame coordinates
-      L.el.classList.add("g2-tree");
+      function I(n, o) { return CXA.img(k, L.el, "eh-" + n, o); }
+      function ex(o) { o.immediateRender = false; return o; }
 
-      var head = CX.title(k, tl, "Exception Hierarchy", { x: 0, y: 22, w: 1920, size: 78, host: L.el });
+      // ---- connector pieces (the user's bar + arrow art) ----
+      var T = 10;                                   // bar thickness
+      var AW = 36, AH = Math.round(36 * 62 / 47);   // the up-arrow, its stem as thick as a bar
+      function bar(x, y, w, h) {
+        var v = h > w, e = k.el("img", "g2-bar", "left:" + x + "px;top:" + y + "px;width:" + w + "px;height:" + h + "px;", null, L.el);
+        e.setAttribute("src", "assets/cx-art/eh-bar-" + (v ? "v" : "h") + ".png");
+        e.setAttribute("data-layout-allow-overlap", "true");
+        k.hide(e); e._v = v; return e;
+      }
+      function arrow(cx, tipY) {                    // tip touches the parent's bottom edge
+        var e = k.el("img", "g2-bar", "left:" + (cx - AW / 2) + "px;top:" + (tipY - 4) + "px;width:" + AW + "px;height:" + AH + "px;", null, L.el);
+        e.setAttribute("src", "assets/cx-art/eh-arrow-up.png");
+        e.setAttribute("data-layout-allow-overlap", "true");
+        k.hide(e); return e;
+      }
+      function grow(e, at, dur, origin) {           // a bar draws itself (scale, never clipPath)
+        var p = e._v ? { scaleY: 0 } : { scaleX: 0 }, q = e._v ? { scaleY: 1 } : { scaleX: 1 };
+        p.autoAlpha = 0; q.autoAlpha = 1; p.transformOrigin = origin || (e._v ? "50% 0%" : "50% 50%");
+        q.duration = dur || 0.3; q.ease = "power2.out";
+        tl.fromTo(e, p, ex(q), at);
+        return at + (dur || 0.3);
+      }
+      function arrowIn(e, at) {                     // arrow springs up out of the bar
+        tl.fromTo(e, { autoAlpha: 0, scaleY: 0.2, scaleX: 0.6, transformOrigin: "50% 100%" },
+          ex({ autoAlpha: 1, scaleY: 1, scaleX: 1, duration: 0.4, ease: "back.out(2.2)" }), at);
+        return at + 0.4;
+      }
 
-      var BH = 66, F = 22;
-      function B(text, x, y, w, color) { return CX.box(k, L.el, { x: x, y: y, w: w, h: BH, text: text, color: color, font: F }); }
-      // row 1 / row 2
-      var base = B("BaseException", 820, 150, 280, "pink");
-      var R2Y = 285, r2 = [["Exception", 250], ["SystemExit", 760], ["GeneratorExit", 1170], ["KeyboardInterrupt", 1560]]
-        .map(function (a, i) { return B(a[0], a[1] - 135, R2Y, i === 3 ? 290 : 270, "violet"); });
+      // ---- boxes ----
+      var head = I("title2", { cx: 960, y: 40, h: 132 });     // the user's title board
+      var base = I("BaseException", { cx: 960, y: 206, h: 96 });
+      var R2Y = 384, r2 = [["Exception", 316], ["SystemExit", 749], ["GeneratorExit", 1183], ["KeyboardInterrupt", 1612]]
+        .map(function (a) { return I(a[0], { cx: a[1], y: R2Y, h: 88 }); });
       var exc = r2[0];
-      // row 3 - children of Exception
-      var R3Y = 420, W3 = 214, G3 = 16, X3 = 48;
-      var r3 = ["AttributeError", "ArithmeticError", "EOFError", "NameError", "LookupError", "OSError", "TypeError", "ValueError"]
-        .map(function (n, i) { return B(n, X3 + i * (W3 + G3), R3Y, W3, "blue"); });
-      // row 4 - columns under ArithmeticError, LookupError, OSError
-      var R4Y = 560, P4 = 82, W4 = 248;
-      function col(parent, names, w) {
-        return names.map(function (n, i) { return B(n, parent.left + 34, R4Y + i * P4, w || W4, "teal"); });
+      var R3Y = 548, H3 = 78, N3 = ["AttributeError", "ArithmeticError", "EOFError", "NameError", "LookupError", "OSError", "TypeError", "ValueError"];
+      var sumW = N3.reduce(function (s, n) { var z = CXA.SZ["eh-" + n]; return s + H3 * z[0] / z[1]; }, 0);
+      var G3 = (1880 - sumW) / 7, x3 = 20;
+      var r3 = N3.map(function (n) { var b = I(n, { x: x3, y: R3Y, h: H3 }); x3 += b.w + G3; return b; });
+      var R4Y = 684, P4 = 72, H4 = 60;
+      function col(parent, names, ind) {
+        return names.map(function (n, i) { return I(n, { x: parent.left + ind + 30, y: R4Y + i * P4, h: H4 }); });
       }
-      var arith = col(r3[1], ["ZeroDivisionError", "FloatingPointError", "OverflowError"]);
-      var look = col(r3[4], ["IndexError", "KeyError"], 170);
-      var os = col(r3[5], ["FileNotFoundError", "InterruptedError", "PermissionError", "TimeoutError"]);
+      var arith = col(r3[1], ["ZeroDivisionError", "FloatingPointError", "OverflowError"], 26);
+      var look = col(r3[4], ["IndexError", "KeyError"], 22);
+      var os = col(r3[5], ["FileNotFoundError", "InterruptedError", "PermissionError", "TimeoutError"], 26);
 
-      // Is-A connectors: from the child up to its parent, head on the parent
-      function up(child, parent, busY) {
-        return L.arrow({ d: "M" + child.cx + " " + child.top + " V " + busY + " H " + parent.cx + " V " + (parent.bot + 2), width: 3, headSize: 11 });
+      // ---- a row under a parent: arrow, bus, one drop per child ----
+      function rowParts(parent, kids) {
+        var busY = parent.bot - 4 + AH - 6;                       // the arrow's stem foot sinks into the bus
+        var x0 = kids[0].cx - T / 2, x1 = kids[kids.length - 1].cx + T / 2;
+        return {
+          arrow: arrow(parent.cx, parent.bot),
+          bus: bar(parent.cx - T / 2, busY, T, T),
+          // one bus segment per child, from the parent's line to that child: the bus only reaches a box as it arrives
+          segs: kids.map(function (c) { var a = Math.min(c.cx, parent.cx) - T / 2, b = Math.max(c.cx, parent.cx) + T / 2;
+            var s = bar(a, busY, b - a, T); s._o = c.cx < parent.cx ? "100% 50%" : "0% 50%"; return s; }),
+          drops: kids.map(function (c) { return bar(c.cx - T / 2, busY + 2, T, c.top + 6 - busY - 2); })
+        };
       }
-      function side(child, parent) {
-        var sx = parent.left + 16, my = child.top + BH / 2;
-        return L.arrow({ d: "M" + child.left + " " + my + " H " + sx + " V " + (parent.bot + 2), width: 3, headSize: 11 });
+      function rowIn(P, kids, at, stag) {
+        arrowIn(P.arrow, at);
+        grow(P.bus, at + 0.25, 0.4);
+        P.drops.forEach(function (d) { grow(d, at + 0.6, 0.2); });
+        var t = at + 0.85;
+        kids.forEach(function (b, i) { CXA.pop(k, tl, b, t + i * stag); });
+        return t + (kids.length - 1) * stag + 0.5;
       }
-      function item(bx, ar, at) {           // box enters -> its label types -> its connector draws
-        var t = CX.boxIn(k, tl, bx, at, 0.022);
-        if (ar) L.draw(ar, t - 0.05, 0.35);
-        return t + 0.2;
+      // ---- a column under a parent: arrow, trunk, a stub per child ----
+      function colParts(parent, kids, ind) {
+        var sx = parent.left + ind, top = parent.bot - 4 + AH - 8;
+        return {
+          arrow: arrow(sx, parent.bot),
+          trunk: bar(sx - T / 2, top, T, kids[kids.length - 1].cy + T / 2 - top),
+          stubs: kids.map(function (c) { return bar(sx - T / 2, c.cy - T / 2, c.left + 6 - (sx - T / 2), T); })
+        };
       }
+      function colIn(P, kids, at) {
+        arrowIn(P.arrow, at);
+        grow(P.trunk, at + 0.25, 0.25 + 0.1 * kids.length);
+        var t = at + 0.6;
+        kids.forEach(function (b, i) {               // children one by one: stub reaches out, box pops
+          grow(P.stubs[i], t, 0.2, "0% 50%");
+          t = CXA.pop(k, tl, b, t + 0.12) + 0.25;
+        });
+        return t;
+      }
+      var P2 = rowParts(base, r2), P3 = rowParts(exc, r3);
+      var CA = colParts(r3[1], arith, 26), CL = colParts(r3[4], look, 22), CO = colParts(r3[5], os, 26);
 
       var t = 0.3;
-      BEAT.S05r1 = t; t = CX.rain(k, tl, head, t, { stagger: 0.045 }) + 0.6;
-      BEAT.S06r1 = t; t = item(base, null, t) + 0.6;
-      BEAT.S06r2 = t; t = item(exc, null, t) + 0.6;
-      // S07 row 2 siblings, then the connectors up to BaseException
-      BEAT.S07r1 = t;
-      for (var i = 1; i < 4; i++) t = item(r2[i], null, t);
-      r2.forEach(function (b, i) { L.draw(up(b, base, 252), t + i * 0.08, 0.4); });
-      t += 0.9;
-      // row 3 under Exception
-      BEAT.S07r2 = t;
-      for (i = 0; i < 7; i++) t = item(r3[i], up(r3[i], exc, 390), t);
-      t += 0.7;
-      // S08 ValueError joins row 3, then ArithmeticError's children
-      BEAT.S08r1 = t; t = item(r3[7], up(r3[7], exc, 390), t) + 0.7;
-      BEAT.S08r2 = t; arith.forEach(function (b) { t = item(b, side(b, r3[1]), t); }); t += 0.8;
-      // S09 LookupError, then OSError
-      BEAT.S09r1 = t; look.forEach(function (b) { t = item(b, side(b, r3[4]), t); }); t += 0.8;
-      BEAT.S09r2 = t; os.forEach(function (b) { t = item(b, side(b, r3[5]), t); }); t += 1.2;
-      // S10 / S11 hold the full tree
+      // 1. the headline title
+      BEAT.S05r1 = t; t = CXA.pop(k, tl, head, t) + 1.0;
+      // 2. BaseException
+      BEAT.S06r1 = t; t = CXA.pop(k, tl, base, t) + 0.9;
+      // storyboard order: S06 BaseException, then Exception; S07 the rest of row 2; row 3 under
+      // Exception; S08 ValueError joins row 3 - each row arrives with its arrow and bus
+      function lineIn(P, at) { arrowIn(P.arrow, at); grow(P.bus, at + 0.25, 0.4); return at + 0.7; }
+      function kidIn(P, kids, i, at) { grow(P.segs[i], at, 0.25, P.segs[i]._o); grow(P.drops[i], at + 0.2, 0.2); return CXA.pop(k, tl, kids[i], at + 0.32) + 0.05; }
+      // 3. row 2 with its arrow: Exception first, then its siblings one by one
+      // one click per group: row 2 all together, row 3 all together, then each family of children together
+      // children FIRST, then the connectors grow up from them, and the arrow lands on the parent last
+      function groupIn(P, kids, at) {
+        kids.forEach(function (b) { CXA.pop(k, tl, b, at); });
+        P.drops.forEach(function (d) { grow(d, at + 0.6, 0.25, "50% 100%"); });            // up out of each child
+        P.segs.forEach(function (s) { grow(s, at + 0.85, 0.3, s._o === "100% 50%" ? "0% 50%" : "100% 50%"); });   // along to the parent's line
+        arrowIn(P.arrow, at + 1.15);                                                          // into the parent
+        return at + 1.6;
+      }
+      function colAll(P, kids, at) {
+        kids.forEach(function (b) { CXA.pop(k, tl, b, at); });
+        kids.forEach(function (b, i) { grow(P.stubs[i], at + 0.6, 0.2, "100% 50%"); });     // from each child to the trunk
+        grow(P.trunk, at + 0.8, 0.45, "50% 100%");                                           // the trunk climbs to the parent
+        arrowIn(P.arrow, at + 1.25);
+        return at + 1.7;
+      }
+      // 3. SystemExit, GeneratorExit, KeyboardInterrupt with Exception - row 2 in one click
+      BEAT.S06r2 = t; BEAT.S07r1 = t; t = groupIn(P2, r2, t) + 1.2;
+      // 4. every child class of Exception - row 3 in one click
+      BEAT.S07r2 = t; BEAT.S08r1 = t; t = groupIn(P3, r3, t) + 1.2;
+      // 5. ArithmeticError's children, then LookupError's, then OSError's - one click each
+      BEAT.S08r2 = t; t = colAll(CA, arith, t) + 1.2;
+      BEAT.S09r1 = t; t = colAll(CL, look, t) + 1.2;
+      BEAT.S09r2 = t; t = colAll(CO, os, t) + 1.4;
+      // S10 / S11 hold the full tree (the hold keeps the scene's original 26.5 s length)
       BEAT.S10r1 = t; t += 1.5;
-      BEAT.S11r1 = t; t += 1.5;
+      BEAT.S11r1 = t; t = Math.max(t + 1.5, 25.9);
       BEAT.end = t;
+      // a slow push-in across the hold keeps the finished tree alive on screen
+      tl.fromTo(L.el, { scale: 1, transformOrigin: "50% 45%" }, { scale: 1.012, duration: t - BEAT.S10r1, ease: "sine.inOut", immediateRender: false }, BEAT.S10r1);
       k.out(L.el, t, 0.5);
       window.__g2aEnd = t + 0.6;
 

@@ -1,70 +1,109 @@
 <template id="g5-a-template">
   <style>
     #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-    .g5-panel { position: absolute; }
-    .g5-panel::before { content: ""; position: absolute; inset: 0; border: 40px solid transparent;
-      border-image: url("assets/gl-frame-pink.png") 90 fill stretch; filter: hue-rotate(40deg); }
-    .g5-lab { position: absolute; font-family: "Nunito", "Segoe UI", sans-serif; font-weight: 400; font-size: 44px;
-      color: #fff; white-space: pre; text-shadow: 0 2px 0 rgba(0,0,0,.6), 0 6px 10px rgba(0,0,0,.5); }
-    .g5-field { position: absolute; border-radius: 16px; background: linear-gradient(180deg, #0b1220, #121c2e);
-      border: 2px solid #33445f; box-shadow: inset 0 4px 8px rgba(0,0,0,.6), 0 2px 0 rgba(255,255,255,.06); }
-    .g5-val { position: absolute; left: 24px; top: 0; bottom: 0; display: flex; align-items: center;
-      font-family: "JetBrains Mono", Consolas, monospace; font-size: 38px; color: #4fd1ff; white-space: pre; }
-    .g5-btn { position: absolute; }
-    .g5-btn::before { content: ""; position: absolute; inset: 0; border: 24px solid transparent;
-      border-image: url("assets/gl-frame-violet.png") 90 fill stretch; filter: hue-rotate(-95deg); }
-    .g5-btn span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-      font-family: "Nunito", "Segoe UI", sans-serif; font-size: 40px; color: #fff; text-shadow: 0 3px 5px rgba(0,0,0,.5); }
+    .g5-bg { position: absolute; inset: 0;
+      background: radial-gradient(900px 600px at 25% 35%, #13244d 0%, rgba(19,36,77,0) 70%), linear-gradient(160deg, #0b1633 0%, #070d22 100%); }
+    .g5-room { position: absolute; left: 907px; top: 0; width: 1013px; height: 1080px;
+      background: radial-gradient(700px 500px at 60% 30%, #1a2d5c 0%, rgba(26,45,92,0) 70%), linear-gradient(180deg, #101c3c 0%, #0a1229 100%);
+      box-shadow: -18px 0 40px rgba(0,0,0,.55); }
+    .g5-patch { position: absolute; border-radius: 8px; background: #19294a; }
+    .g5-val { position: absolute; display: flex; align-items: center; white-space: pre;
+      font-family: "Nunito", "Segoe UI", sans-serif; font-weight: 400; font-size: 44px; color: #ffffff; font-weight: 600;
+      text-shadow: 0 2px 4px rgba(0,0,0,.6); }
   </style>
   <div data-hf-id="hf-0l52" id="root" data-composition-id="g5-a" data-width="1920" data-height="1080" data-duration="16"></div>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
   <script src="assets/kit.js"></script>
   <script src="assets/cx.js"></script>
+  <script src="assets/cx-art.js"></script>
   <script>
     (function () {
+      // Sign up page assembled from the user's component sheet (assets/cx-art/su-*) to match their final
+      // sign-up image; every piece pops up, then the form is filled in and the two failures appear.
       var tl = gsap.timeline({ paused: true });
       var root = document.querySelector('[data-composition-id="g5-a"]');
       var k = K.make(root, tl);
       var BEAT = window.__g5aBeats = {};
-      var L = k.layer({ x: 0, y: 56, w: 1920, h: 1080 });
+      var L = k.layer({ x: 0, y: 56, w: 1920, h: 1080 });     // true frame coordinates
+      // the user's new "Sign in" page art (assets/cx-art/si-*), laid out to match their final image
+      function I(n, o) { return CXA.img(k, L.el, "si-" + n, o); }
 
-      // the Sign up page panel (orange frame)
-      var PX = 560, PY = 60, PW = 800, PH = 640;
-      var panel = k.hide(k.el("div", "g5-panel", "left:" + PX + "px;top:" + PY + "px;width:" + PW + "px;height:" + PH + "px;", null, L.el));
-      var ttl = CX.title(k, tl, "Sign up page", { x: PX, y: PY + 46, w: PW, size: 64, host: L.el });
-      var FX = PX + 330, FW = 400, rows = [["UserName", "Pythonfan"], ["Mobile", "9975268922"], ["Password", "**********"]];
-      var F = rows.map(function (r, i) {
-        var y = PY + 180 + i * 116;
-        var lab = k.hide(k.el("div", "g5-lab", "left:" + (PX + 70) + "px;top:" + (y + 6) + "px;", r[0], L.el));
-        var fld = k.hide(k.el("div", "g5-field", "left:" + FX + "px;top:" + y + "px;width:" + FW + "px;height:74px;", null, L.el));
-        var val = k.el("div", "g5-val", null, r[1], fld);
-        val._chars = k.splitChars(val); val._chars.forEach(k.hide);
-        return { lab: lab, fld: fld, val: val };
-      });
-      var btn = k.hide(k.el("div", "g5-btn", "left:" + (PX + 260) + "px;top:" + (PY + 528) + "px;width:280px;height:84px;", "<span>Sign up</span>", L.el));
+      var bg = k.hide(k.el("div", "g5-bg", null, null, L.el));
+      var waveT = I("wave", { x: 560, y: -40, w: 440, css: "transform:rotate(180deg);" });
+      var waveB = I("wave", { x: -250, y: 905, w: 620 });
+      // the room on the right
+      var room = k.hide(k.el("div", "g5-room", null, null, L.el));
+      var lamp = I("lamp", { x: 1814, y: -10, h: 222 });
+      var mon1 = I("monitor", { x: 993, y: 373, h: 178 });
+      var mon2 = I("monitor", { x: 1825, y: 327, h: 166 });
+      var plant = I("plant", { x: 907, y: 224, h: 316 });
+      var desk = I("desk", { x: 907, y: 800, w: 1050, h: 160 });
+      var books = I("books", { x: 1676, y: 880, w: 245 });
+      var kids = I("kids", { x: 918, y: 138, w: 1033 });
+      // the form on the left
+      var logo = I("logo", { x: 172, y: 70, w: 284 });
+      var ttl = I("title", { x: 155, y: 235, w: 296 });
+      var lap = I("laptop", { x: 522, y: 165, w: 295 });
+      var FX = 130, FW = 699;
+      var F = [["field-user", 400, "Pythonfan"], ["field-mobile", 526, "9975268922"], ["field-pass", 652, "*******"]]
+        .map(function (a) {
+          var f = I(a[0], { x: FX, y: a[1], w: FW });
+          // the field's own label ("Username" ...) stays; the typed value sits to its right
+          var px = f.x + f.w * 0.575, ph = f.h * 0.6, py = f.y + f.h * 0.5 - ph / 2 - f.h * 0.06;
+          var patch = k.hide(k.el("div", null, "position:absolute;left:" + px + "px;top:" + py + "px;width:1px;height:1px;", null, L.el));
+          var val = k.el("div", "g5-val", "left:" + px + "px;top:" + py + "px;height:" + ph + "px;", a[2], L.el);
+          val._chars = k.splitChars(val); val._chars.forEach(k.hide);
+          return { f: f, patch: patch, val: val };
+        });
+      var btn = I("button", { x: 157, y: 800, w: 652 });
 
       // the two failures, 3-D lettering under the form
-      var dup = CX.title(k, tl, "DuplicateUserError", { x: 0, y: 760, w: 1920, size: 72, color: "green", host: L.el });
-      var weak = CX.title(k, tl, "WeakPasswordError", { x: 0, y: 870, w: 1920, size: 72, color: "yellow", host: L.el });
+      // the user's 3-D error lettering (assets/cx-art/su-err-*), typed on: a window over the art
+      // widens one letter-step at a time (overflow, never clipPath)
+      function errArt(name, n, cx, y, w) {
+        var s = CXA.SZ[name], h = w * s[1] / s[0];
+        var win = k.hide(k.el("div", null, "position:absolute;overflow:hidden;left:" + (cx - w / 2) + "px;top:" + y + "px;width:" + w + "px;height:" + h + "px;", null, L.el));
+        win.setAttribute("data-layout-allow-overflow", "true");
+        CXA.img(k, win, name, { x: 0, y: 0, w: w, show: true });
+        return { el: win, w: w, n: n };
+      }
+      function typeArt(E, at, per) {
+        tl.fromTo(E.el, { autoAlpha: 0, width: 0 }, { autoAlpha: 1, width: E.w, duration: E.n * per, ease: "steps(" + E.n + ")", immediateRender: false }, at);
+        return at + E.n * per;
+      }
+      var dup = errArt("su-err-dup", 18, 483, 940, 520);
+      var weak = errArt("su-err-weak", 17, 483, 1006, 540);
 
       var t = 0.3;
-      // S36 the Sign up page slides in
+      // S36 the Sign up page builds itself, piece by piece
       BEAT.S36r1 = t;
-      tl.fromTo(panel, { autoAlpha: 0, x: 220 }, { autoAlpha: 1, x: 0, duration: 0.6, ease: "power3.out", immediateRender: false }, t);
-      t += 0.7; t = CX.rain(k, tl, ttl, t, { stagger: 0.04, drop: 120 });
-      F.forEach(function (f) { k.fade(f.lab, t, 0.3); k.rise(f.fld, t + 0.1, { dy: 14, dur: 0.4 }); t += 0.35; });
-      t = k.pop(btn, t) + 1.0;
-      // S37 filling in the form
-      F.forEach(function (f, i) {
+      k.fade(bg, t, 0.4); k.fade(waveT.el, t + 0.1, 0.5); k.fade(waveB.el, t + 0.1, 0.5);
+      tl.fromTo(room, { autoAlpha: 0, x: 260 }, { autoAlpha: 1, x: 0, duration: 0.6, ease: "power3.out", immediateRender: false }, t + 0.15);
+      [lamp, mon1, mon2, plant, books].forEach(function (p, i) { CXA.pop(k, tl, p, t + 0.5 + i * 0.08); });
+      k.rise(desk.el, t + 0.6, { dy: 40, dur: 0.5 });
+      k.rise(kids.el, t + 0.75, { dy: 120, dur: 0.7 });
+      t += 0.5;
+      t = CXA.pop(k, tl, logo, t) - 0.18;
+      t = CXA.pop(k, tl, ttl, t) - 0.18;
+      t = CXA.pop(k, tl, lap, t) - 0.1;
+      F.forEach(function (o) { t = CXA.pop(k, tl, o.f, t) - 0.12; });
+      t = CXA.pop(k, tl, btn, t) + 0.9;
+      // S37 filling in the form: the placeholder goes, the value types on
+      F.forEach(function (o, i) {
         BEAT["S37r" + (i + 1)] = t;
-        f.val._chars.forEach(function (s, j) { tl.fromTo(s, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01, ease: "none", immediateRender: false }, t + j * 0.07); });
-        t += f.val._chars.length * 0.07 + 0.8;
+        k.fade(o.patch, t, 0.15);
+        o.val._chars.forEach(function (s, j) { tl.fromTo(s, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01, ease: "none", immediateRender: false }, t + 0.15 + j * 0.07); });
+        t += 0.15 + o.val._chars.length * 0.07 + 0.7;
       });
-      t += 0.4;
+      t += 0.3;
       // S38 first failure, S39 second failure
-      BEAT.S38r1 = t; t = CX.rain(k, tl, dup, t, { stagger: 0.04, drop: 55 }) + 1.2;
-      BEAT.S39r1 = t; t = CX.rain(k, tl, weak, t, { stagger: 0.04, drop: 55 }) + 1.6;
+      BEAT.S38r1 = t; typeArt(dup, t, 0.06); t += 18 * 0.04 + 0.75 + 1.2;
+      BEAT.S39r1 = t; typeArt(weak, t, 0.06); t += 17 * 0.04 + 0.75 + 1.4;
+      var h0 = BEAT.S39r1 + 1.0;
+      t = Math.max(t, 15.3);
       BEAT.end = t;
+      // gentle push-in across the hold keeps the finished page alive on screen
+      tl.fromTo(L.el, { scale: 1, transformOrigin: "50% 50%" }, { scale: 1.01, duration: t - h0, ease: "sine.inOut", immediateRender: false }, h0);
       k.out(L.el, t, 0.5);
       window.__g5aEnd = t + 0.6;
 

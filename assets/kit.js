@@ -474,7 +474,7 @@
       }
       if (o.out) Promise.resolve().then(function () {
         var mc = ctx.mainCode;
-        if (mc && mc.hugW) { var clear = o0x(mc) + mc.hugW() + 17 + 50; if (clear > o.x) w.style.left = clear + "px"; }
+        if (mc && mc.hugW && !o.fixed) { var clear = o0x(mc) + mc.hugW() + 17 + 50; if (clear > o.x) w.style.left = clear + "px"; }
         if (!outStates.length) return;
         var s0 = outStates[0];
         w.style.width = s0.w + "px"; w.style.height = s0.h + "px";
@@ -498,14 +498,27 @@
           L.rows.slice(1).forEach(function (e) { ev.push(e[0]); });
         });
         ev.sort(function (a, b) { return a - b; });
+        // o.grow: the WIDTH also follows the lines on screen (widest visible line + padding), so the
+        // window widens as a long line starts typing and narrows when it goes - no empty padding.
+        function wAt(t) {
+          var m = 0;
+          W.lines.forEach(function (L) { if (L.showAt <= t && t < L.hideAt) m = Math.max(m, L.text.replace(/\s+$/, "").length); });
+          return Math.max(o.minW || 420, Math.round(26 + m * CW + 34));
+        }
         var prev = hAt(-1e9); w.style.height = prev + "px";
+        var prevW = wAt(-1e9);
         ev.forEach(function (t, i) {
           if (i && t === ev[i - 1]) return;
           var h = hAt(t);
           if (h !== prev) tl.fromTo(w, { height: prev }, ex({ height: h, duration: 0.25, ease: "power2.out" }), t);
           prev = h;
+          if (o.grow) {
+            var ww = wAt(t);
+            if (ww !== prevW) tl.fromTo(w, { width: prevW }, ex({ width: ww, duration: 0.25, ease: "power2.out" }), t);
+            prevW = ww;
+          }
         });
-        var hw = W.hugW(); w.style.width = hw + "px";
+        var hw = W.hugW(); w.style.width = (o.grow ? wAt(-1e9) : hw) + "px";
         defBars.forEach(function (b) { b.style.width = (hw - 30) + "px"; });
       });
       // Height that fits `rows` rows of code.
@@ -540,10 +553,10 @@
         return at + 0.6;
       };
       // Output window: print the next line (types at 0.03 s a character).
-      W.print = function (text, cls, at) {
+      W.print = function (text, cls, at, per) {
         var L = W.add(text, W.row, { cls: cls }); W.row += 1;
         if (o.out) { var f = outFit(); outStates.push({ at: at, w: f.w, h: f.h }); W.cur = { w: f.w, h: f.h }; }
-        return W.type(L, at);
+        return W.type(L, at, per);
       };
       // Edit a line in place, like an editor: the unchanged prefix/suffix stay put, only the
       // changed middle types in (deletions are instant). Works for _bal -> __bal, get_bal -> bal,

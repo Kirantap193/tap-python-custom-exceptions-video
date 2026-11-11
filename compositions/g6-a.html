@@ -2,7 +2,7 @@
   <style>
     #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
   </style>
-  <div data-hf-id="hf-k2qn" id="root" data-composition-id="g6-a" data-width="1920" data-height="1080" data-duration="115"></div>
+  <div data-hf-id="hf-k2qn" id="root" data-composition-id="g6-a" data-width="1920" data-height="1080" data-duration="121"></div>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
   <script src="assets/kit.js"></script>
   <script src="assets/cx.js"></script>
@@ -13,24 +13,24 @@
       var k = K.make(root, tl);
       var BEAT = window.__g6aBeats = {};
 
-      var cw = k.win({ x: 36, y: 150, w: 1000, h: 400, title: "Main.py", dash: true, font: 28, lh: 40 });
+      var cw = k.win({ x: 36, y: 150, w: 1000, h: 400, title: "Main.py", dash: true, font: 28, lh: 40, grow: true });
       var E = CX.editor(k, tl, cw, 20.5);
       var N = E.N, B = E.B;
       var eUser = E.load(["class User:"], true)[0];
       var eUN = N("    user_name = set()"), eInit = N("    def __init__(self,):");
-      var eSU = N("        self.un = un"), eSM = N("        self.mob = mob"), eSP = N("        self.pwd = pwd");
+      var eSU = N("        self.username = username"), eSM = N("        self.mobile = mobile"), eSP = N("        self.password = password");
       var eAdd = N("    def add_user(self):"), eIf = N("        if sel");
       var eRD = N("            raise DuplicateUserError('Username already exist')");
       var eDup = N("class DuplicateUserError(Exception):"), eDupP = N("    pass");
-      var eElse = N("        else:"), eAddU = N("            user_name.add(self.un)");
-      var eVal = N("    def validate(self):"), eUC = N("        uc=lc=sp=num=0"), eFor = N("        for i in self.pwd:");
+      var eElse = N("        else:"), eAddU = N("            user_name.add(self.username)");
+      var eVal = N("    def validate(self):"), eUC = N("        uc=lc=sp=num=0"), eFor = N("        for i in self.password:");
       var eIU = N("            if i.isupper():"), eU1 = N("                uc += 1"), eIL = N("            elif i.islower():");
       var eL1 = N("                lc += 1"), eID = N("            elif i.isdigit():"), eN1 = N("                num += 1");
       var eEl = N("            else:"), eS1 = N("                sp += 1");
       var eIfS = N("        if"), eIfS2 = N("        lc==0 or num==0 or sp==0:"), eRa = N("            ra"), eElse2 = N("        else");
       var eSA = N("        self.add_user()"), eSV = N("        self.validate()");
       var eMain = N("def main():"), eIn = N("    input('Enter Username: ')");
-      var eMob = N("    mob = int(input('Enter Mobile: '))"), ePw = N("    pwd = input('Enter Password: ')"), eUo = N("    u1 = User(un, mob, pwd)");
+      var eMob = N("    mobile = int(input('Enter Mobile: '))"), ePw = N("    password = input('Enter Password: ')"), eUo = N("    u1 = User(username, mobile, password)");
       var eWk = N("class WeakPasswordError(Exception):"), eWkP = N("    pass");
       var eTry = N("    try:"), eE1 = N("    except DuplicateUserError as e:"), eP1 = N("        print(e)");
       var eE2 = N("    except WeakPasswordError as e:"), eP2 = N("        print(e)");
@@ -39,6 +39,8 @@
 
       function ty(es, at) { return E.typeRun(es, at, { per: 0.045, line: 0.45 }); }
       function add(after, items, at) { return E.ins(after, items, at, 0.4) + 0.15; }
+      // storyboard highlight rows: a neon ring on each line, held, then removed
+      function hl(es, at, dur) { dur = dur || 1.2; var rs = es.map(function (e) { return cw.ring(e.L, 0, 0, null, at); }); k.out(rs, at + dur, 0.3); return at + dur + 0.3; }
 
       var t = 0.3;
       // S40 class User:
@@ -48,23 +50,24 @@
       // S42 / S43 constructor stub, cursor waits in the parameter list
       BEAT.S42r1 = t; t = add(eUN, [B(), eInit], t); t = ty([eInit], t) + 0.3;
       BEAT.S43r1 = t; t += 1.0;
-      // S44 un, mob, pwd stored
-      BEAT.S44r1 = t; t = E.ed(eInit, "    def __init__(self,un,mob,pwd):", t) + 0.7;
+      // S44 username, mobile, password stored
+      BEAT.S44r1 = t; t = E.ed(eInit, "    def __init__(self,username,mobile,password):", t) + 0.7;
       BEAT.S44r2 = t; t = add(eInit, [eSU, eSM, eSP], t); t = ty([eSU, eSM, eSP], t) + 0.6;
       // S45 / S46 add_user: is the username taken?
       BEAT.S45r1 = t; t = add(eSP, [B(), eAdd], t); t = ty([eAdd], t);
       BEAT.S45r2 = t; t = add(eAdd, [eIf], t); t = ty([eIf], t) + 0.3;
-      BEAT.S46r1 = t; t = E.ed(eIf, "        if self.un in User.user_name", t) + 1.0;
+      BEAT.S46r1 = t; t = E.ed(eIf, "        if self.username in User.user_name", t) + 0.2;
+      t = hl([eUN], t, 1.0);   // S46 both user_name references
       // S47 raise DuplicateUserError
-      BEAT.S47r1 = t; t = E.ed(eIf, "        if self.un in User.user_name:", t) + 0.3;
-      t = add(eIf, [eRD], t); t = ty([eRD], t) + 1.0;
+      BEAT.S47r1 = t; t = E.ed(eIf, "        if self.username in User.user_name:", t) + 0.3;
+      t = add(eIf, [eRD], t); t = ty([eRD], t) + 0.2; t = hl([eRD], t, 1.2);   // S47 DuplicateUserError selected
       // S48 declaring DuplicateUserError at the top (code shifts down)
       BEAT.S48r1 = t; t = add(null, [eDup, B(), B()], t) + 0.2;
       BEAT.S48r2 = t; t = ty([eDup], t);
       // S49 pass, then otherwise add the username (corrected to User.user_name)
       BEAT.S49r1 = t; t = add(eDup, [eDupP], t); t = ty([eDupP], t) + 0.5;
       BEAT.S49r2 = t; t = add(eRD, [eElse, eAddU], t); t = ty([eElse, eAddU], t) + 0.6;
-      BEAT.S49r3 = t; t = E.ed(eAddU, "            User.user_name.add(self.un)", t) + 0.8;
+      BEAT.S49r3 = t; t = E.ed(eAddU, "            User.user_name.add(self.username)", t) + 0.8;
       // S50 validate method
       BEAT.S50r1 = t; t = add(eAddU, [B(), eVal], t); t = ty([eVal], t);
       // S51 the editor scrolls up to __init__
@@ -84,7 +87,7 @@
       t = add(eS1, [B(), eIfS], t); t = ty([eIfS], t) + 0.4;
       // S56 the strength condition
       BEAT.S56r1 = t; t = E.go(eVal, t, 0.6) + 0.3;
-      t = E.ed(eIfS, "        if len(self.pwd)<6 or uc==0 or\\", t) + 0.6;
+      t = E.ed(eIfS, "        if len(self.password)<6 or uc==0 or\\", t) + 0.6;
       BEAT.S56r2 = t; t = add(eIfS, [eIfS2], t); t = ty([eIfS2], t) + 0.4;
       BEAT.S56r3 = t; t = add(eIfS2, [eRa], t); t = ty([eRa], t) + 0.3;
       // S57 raise WeakPasswordError ('else' typed, then removed)
@@ -93,34 +96,37 @@
       t = E.del([eElse2], t, 0.4) + 0.4;
       // S58 / S59 the whole class so far: who calls add_user and validate?
       BEAT.S58r1 = t; t = E.go(eDup, t, 0.8) + 0.6;
-      BEAT.S59r1 = t; t = E.go(eUser, t, 0.5) + 1.6;
+      BEAT.S59r1 = t; t = E.go(eUser, t, 0.5) + 0.2;
+      hl([eInit], t, 1.6); hl([eAdd], t + 0.4, 1.2); t = hl([eVal], t + 0.8, 0.8);   // S59 __init__ and the two methods
       // S60 call both from the constructor
       BEAT.S60r1 = t; t = add(eSP, [eSA], t); t = ty([eSA], t) + 0.3;
       BEAT.S60r2 = t; t = add(eSA, [eSV], t); t = ty([eSV], t) + 0.6;
       // S61 main(): reading input
       BEAT.S61r1 = t; t = E.go(eIL, t, 0.8) + 0.3;
       t = add(eRa, [B(), B(), eMain], t); t = ty([eMain], t);
-      t = add(eMain, [eIn], t); t = ty([eIn], t) + 0.9;
+      t = add(eMain, [eIn], t); t = ty([eIn], t) + 0.2; t = hl([eIn], t, 1.0);   // S61 input highlighted
       // S62 main(): building the user
-      BEAT.S62r1 = t; t = E.ed(eIn, "    un = input('Enter Username: ')", t) + 0.5;
+      BEAT.S62r1 = t; t = E.ed(eIn, "    username = input('Enter Username: ')", t) + 0.5;
       t = add(eIn, [eMob, ePw], t); t = ty([eMob, ePw], t) + 0.4;
       BEAT.S62r2 = t; t = add(ePw, [B(), eUo], t); t = ty([eUo], t) + 0.8;
       // S63 where each error comes from
-      BEAT.S63r1 = t; t = E.go(eUN, t, 0.8) + 1.4;
+      BEAT.S63r1 = t; t = E.go(eUN, t, 0.8) + 0.2; t = hl([eRD], t, 1.4);   // S63 DuplicateUserError inside add_user
       // S64 declaring WeakPasswordError
       BEAT.S64r1 = t; t = E.go(eDup, t, 0.6) + 0.3;
       t = add(eDupP, [B(), eWk, eWkP], t); t = ty([eWk, eWkP], t) + 0.8;
       // S65 try with two specific excepts
       BEAT.S65r1 = t; t = E.go(eIfS, t, 0.9) + 0.3;
       t = add(SRC_before(eUo), [eTry], t); t = ty([eTry], t) + 0.3;
-      t = E.ed(eUo, "        u1 = User(un, mob, pwd)", t) + 0.6;
+      t = E.ed(eUo, "        u1 = User(username, mobile, password)", t) + 0.6;
       BEAT.S65r2 = t; t = add(eUo, [eE1, eP1], t); t = ty([eE1, eP1], t) + 0.4;
-      BEAT.S65r3 = t; t = add(eP1, [eE2, eP2], t); t = ty([eE2, eP2], t) + 0.6;
+      BEAT.S65r3 = t; t = add(eP1, [eE2, eP2], t); t = ty([eE2, eP2], t) + 0.4;
+      eE3.t = "    e"; t = add(eP2, [eE3], t); t = ty([eE3], t) + 0.4;   // S65 ends with the next except just begun
       // S66 generic except and else
-      BEAT.S66r1 = t; t = add(eP2, [eE3, eP3], t); t = ty([eE3, eP3], t) + 0.4;
+      BEAT.S66r1 = t; t = E.ed(eE3, "    except:", t) + 0.2; t = add(eE3, [eP3], t); t = ty([eP3], t) + 0.4;
       BEAT.S66r2 = t; t = add(eP3, [eE4, eP4], t); t = ty([eE4, eP4], t) + 0.6;
       // S67 calling main()
-      BEAT.S67r1 = t; t = add(eP4, [B(), eCall], t); t = ty([eCall], t) + 1.2;
+      BEAT.S67r1 = t; t = add(eP4, [B(), eCall], t); t = ty([eCall], t) + 0.2; t = hl([eMain, eCall], t, 1.4);   // S67 def main and the call
+      var h0 = t; t = Math.max(t, 120.4); if (t > h0) tl.fromTo(cw.el, { opacity: 1 }, { opacity: 1, duration: t - h0, ease: "none", immediateRender: false }, h0);   // keeps the held frame on screen
       BEAT.end = t;
       k.out(cw.el, t, 0.5);
       window.__g6aEnd = t + 0.6;

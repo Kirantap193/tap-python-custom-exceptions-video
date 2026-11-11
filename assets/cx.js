@@ -144,12 +144,12 @@
   // ---------------- output runs ----------------
   function runner(k, tl, ow) {
     var R = { on: false };
-    ow.type = function (L, at) { if (at < L.showAt) L.showAt = at; return ow._type(L, at, 0.004); };
+    ow.type = function (L, at, per) { if (at < L.showAt) L.showAt = at; return ow._type(L, at, per || 0.004); };
     R.show = function (at) { if (!R.on) { R.on = true; return ow.pop(at) + 0.15; } return at; };
     // lines: [[text, cls], ...] - printed one at a time, 0.45 s apart
     R.run = function (lines, at, gap) {
       at = R.show(at);
-      lines.forEach(function (l, i) { ow.print(l[0], l[1] || 'o-ok', at); at += (i < lines.length - 1 ? (gap || 0.45) : 0.1); });
+      lines.forEach(function (l, i) { var e = ow.print(l[0], l[1] || 'o-ok', at, l[2]); if (l[2]) at = e; at += (i < lines.length - 1 ? (gap || 0.45) : 0.1); });
       return at;
     };
     R.clear = function (at) { return ow.clear(at); };
